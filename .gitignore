@@ -1,19 +1,16 @@
-# Python
+# Virtual environments
+ac_prediction/
 venv/
+env/
+
+# Python cache
 __pycache__/
 *.pyc
 
-# Jupyter
-.ipynb_checkpoints/
-
-# Environment
-.env
-
-# Model training files
+# Dataset
 *.csv
+*.xls
+*.xlsx
 
-# VS Code
+# IDE
 .vscode/
-
-# Logs
-*.log
