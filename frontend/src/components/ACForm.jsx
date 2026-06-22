@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { brands, acTypes, starRatings } from "../constants/AcOptions";
+import { brands, acTypes, starRatings, tonnages, userRatings } from "../utils/constants";
+import logger from "../utils/logger";
 
 function ACForm({ onPredict }) {
   const [form, setForm] = useState({
@@ -14,16 +15,14 @@ function ACForm({ onPredict }) {
   });
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
+    setForm({ ...form, [e.target.name]: e.target.value });
+    logger.debug("Form field changed", { field: e.target.name, value: e.target.value });
   };
 
   const submitHandler = (e) => {
     e.preventDefault();
 
-    onPredict({
+    const payload = {
       brand: form.brand,
       ac_type: form.ac_type,
       tonnage: Number(form.tonnage),
@@ -32,10 +31,12 @@ function ACForm({ onPredict }) {
       wifi_enabled: Number(form.wifi_enabled),
       rating: Number(form.rating),
       bought_last_month: Number(form.bought_last_month),
-      // Derived features computed on frontend
       smart: Number(form.inverter) === 1 && Number(form.wifi_enabled) === 1 ? 1 : 0,
       energy_efficient: Number(form.star_rating) === 1 ? 0 : Number(form.star_rating) < 5 ? 1 : 2,
-    });
+    };
+
+    logger.info("Form submitted", payload);
+    onPredict(payload);
   };
 
   return (
@@ -44,36 +45,33 @@ function ACForm({ onPredict }) {
       <form onSubmit={submitHandler}>
         <label>Brand</label>
         <select name="brand" onChange={handleChange}>
-          <option>Select Brand</option>
+          <option value="">Select Brand</option>
           {brands.map((brand) => (
-            <option key={brand}>{brand}</option>
+            <option key={brand} value={brand}>{brand}</option>
           ))}
         </select>
 
         <label>AC Type</label>
         <select name="ac_type" onChange={handleChange}>
-          <option>Select Type</option>
+          <option value="">Select Type</option>
           {acTypes.map((type) => (
-            <option key={type}>{type}</option>
+            <option key={type} value={type}>{type}</option>
           ))}
         </select>
 
         <label>Tonnage</label>
-        <input
-          type="number"
-          step="0.1"
-          name="tonnage"
-          placeholder="Example 1.5"
-          onChange={handleChange}
-        />
+        <select name="tonnage" onChange={handleChange}>
+          <option value="">Select Tonnage</option>
+          {tonnages.map((ton) => (
+            <option key={ton} value={ton}>{ton} Ton</option>
+          ))}
+        </select>
 
         <label>Star Rating</label>
         <select name="star_rating" onChange={handleChange}>
-          <option>Select Star Rating</option>
+          <option value="">Select Star Rating</option>
           {starRatings.map((star) => (
-            <option key={star} value={star}>
-              {star} Star
-            </option>
+            <option key={star} value={star}>{star} Star</option>
           ))}
         </select>
 
@@ -90,19 +88,20 @@ function ACForm({ onPredict }) {
         </select>
 
         <label>User Rating</label>
-        <input
-          type="number"
-          step="0.1"
-          name="rating"
-          placeholder="Example 4.3"
-          onChange={handleChange}
-        />
+        <select name="rating" onChange={handleChange}>
+          <option value="">Select Rating</option>
+          {userRatings.map((r) => (
+            <option key={r} value={r}>{r} ⭐</option>
+          ))}
+        </select>
 
         <label>Bought Last Month</label>
         <input
           type="number"
           name="bought_last_month"
           placeholder="Example 500"
+          max={10000}
+          min={0}
           onChange={handleChange}
         />
 

@@ -1,31 +1,25 @@
-import {useState} from "react";
+import { useState } from "react";
+import { predictACPrice } from "../services/predictionService";
+import logger from "../utils/logger";
 
-import {predictACPrice} from "../services/PredictionService";
+export default function usePrediction() {
+  const [prediction, setPrediction] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-export default function usePrediction(){
+  const predict = async (data) => {
+    try {
+      setLoading(true);
+      logger.info("Prediction started", data);
 
-const [prediction,setPrediction]=useState(null);
+      const result = await predictACPrice(data);
+      setPrediction(result);
+      logger.info("Prediction successful", result);
+    } catch (error) {
+      logger.error("Prediction failed", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-const [loading,setLoading]=useState(false);
-
-const predict=async(data)=>{
-try{
-
-setLoading(true);
-const result = await predictACPrice(data);
-setPrediction(result);
-
-}
-catch(error){
-console.log(error);
-}
-
-finally{
-setLoading(false);
-}
-
-};
-
-
-return {prediction, loading, predict};
+  return { prediction, loading, predict };
 }

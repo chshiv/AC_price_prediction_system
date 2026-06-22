@@ -1,6 +1,6 @@
 import ACForm from "./components/ACForm";
 import PredictionResult from "./components/PredictionResult";
-import usePrediction from "./hooks/UsePrediction";
+import usePrediction from "./hooks/usePrediction";
 import "./App.css";
 
 function App() {
